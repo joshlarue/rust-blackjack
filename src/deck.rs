@@ -2,14 +2,21 @@ use rand::prelude::*;
 use std::collections::VecDeque;
 use std::fmt;
 
-enum Suits {
+#[derive(Debug, PartialEq, Clone)]
+pub enum Suit {
     Clubs,
     Diamonds,
     Hearts,
     Spades,
 }
+impl fmt::Display for Suit {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self)
+    }
+}
 
-enum Ranks {
+#[derive(Debug, PartialEq, Clone)]
+pub enum Rank {
     Ace,
     Two,
     Three,
@@ -24,23 +31,49 @@ enum Ranks {
     Queen,
     King,
 }
+impl fmt::Display for Rank {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self)
+    }
+}
+impl Rank {
+    pub fn value(self) -> u8 {
+        match self {
+            Rank::Ace => 10,
+            Rank::Two => 2,
+            Rank::Three => 3,
+            Rank::Four => 4,
+            Rank::Five => 5,
+            Rank::Six => 6,
+            Rank::Seven => 7,
+            Rank::Eight => 8,
+            Rank::Nine => 9,
+            Rank::Ten => 10,
+            Rank::Jack => 10,
+            Rank::Queen => 10,
+            Rank::King => 10,
+        }
+    }
+}
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct Card {
-    pub suit: String,
-    pub rank: String,
+    pub suit: Suit,
+    pub rank: Rank,
 }
 impl Card {
-    fn new(suit: &str, rank: &str) -> Card {
-        Card {
-            suit: suit.to_string(),
-            rank: rank.to_string(),
-        }
+    pub fn new(suit: Suit, rank: Rank) -> Card {
+        Card { suit, rank }
     }
 }
 impl fmt::Display for Card {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{} of {}", self.rank, self.suit)
+    }
+}
+impl PartialEq for Card {
+    fn eq(&self, other: &Self) -> bool {
+        self.suit == other.suit && self.rank == other.rank
     }
 }
 
@@ -49,13 +82,13 @@ pub struct Deck {
     cards: VecDeque<Card>,
 }
 impl Deck {
-    fn new() -> Deck {
+    pub fn new() -> Deck {
         Deck {
             cards: VecDeque::<Card>::new(),
         }
     }
 
-    fn add_card(&mut self, card: Card) {
+    pub fn add_card(&mut self, card: Card) {
         self.cards.push_front(card);
     }
 
@@ -70,17 +103,28 @@ impl Deck {
 }
 
 pub fn new_deck() -> Deck {
-    let suits: Vec<&str> = vec!["Clubs", "Diamonds", "Hearts", "Spades"];
+    let suits: Vec<Suit> = vec![Suit::Clubs, Suit::Diamonds, Suit::Hearts, Suit::Spades];
 
-    let ranks: Vec<&str> = vec![
-        "Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack",
-        "Queen", "King",
+    let ranks: Vec<Rank> = vec![
+        Rank::Ace,
+        Rank::Two,
+        Rank::Three,
+        Rank::Four,
+        Rank::Five,
+        Rank::Six,
+        Rank::Seven,
+        Rank::Eight,
+        Rank::Nine,
+        Rank::Ten,
+        Rank::Jack,
+        Rank::Queen,
+        Rank::King,
     ];
 
     let mut deck = Deck::new();
     for suit in suits.iter() {
         for rank in ranks.iter() {
-            deck.add_card(Card::new(rank, suit));
+            deck.add_card(Card::new(suit.clone(), rank.clone()));
         }
     }
 
