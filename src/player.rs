@@ -1,14 +1,23 @@
+use crate::card::*;
 use crate::deck::*;
+
+#[derive(PartialEq, Debug)]
+pub enum PlayerType {
+    Dealer,
+    Player1,
+    Player2,
+}
 
 #[derive(Debug, PartialEq)]
 pub struct Player {
-    name: String,
+    player_type: PlayerType,
     hand: Vec<Card>,
 }
+
 impl Player {
-    pub fn new(name: &str) -> Player {
+    pub fn new(player_type: PlayerType) -> Player {
         Player {
-            name: name.to_string(),
+            player_type,
             hand: vec![],
         }
     }
@@ -51,9 +60,9 @@ mod tests {
     #[test]
     fn new_player_created() {
         assert_eq!(
-            Player::new("player"),
+            Player::new(PlayerType::Player1),
             Player {
-                name: "player".to_string(),
+                player_type: PlayerType::Player1,
                 hand: vec![]
             }
         )
@@ -61,7 +70,7 @@ mod tests {
 
     #[test]
     fn draw_correct_card() {
-        let mut player = Player::new("player");
+        let mut player = Player::new(PlayerType::Player1);
         let mut deck = Deck::new();
         deck.add_card(Card::new(Suit::Hearts, Rank::Ten));
         player.draw_card(&mut deck);
@@ -71,7 +80,7 @@ mod tests {
 
     #[test]
     fn correct_hand_value() {
-        let mut player = Player::new("player");
+        let mut player = Player::new(PlayerType::Player1);
         let mut deck = Deck::new();
         deck.add_card(Card {
             suit: Suit::Hearts,
