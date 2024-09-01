@@ -7,6 +7,7 @@ pub struct Deck {
     cards: VecDeque<Card>,
 }
 impl Deck {
+    // new and add_card are only public because of tests in player.rs
     pub fn new() -> Deck {
         Deck {
             cards: VecDeque::<Card>::new(),

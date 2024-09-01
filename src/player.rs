@@ -26,21 +26,32 @@ impl Player {
         self.hand.push(deck.deal_card());
     }
 
-    pub fn show_hand(self) -> Vec<Card> {
+    pub fn return_hand(self) -> Vec<Card> {
         self.hand
     }
 
-    pub fn calculate_hand_value(self) -> u8 {
+    pub fn print_first_card(&self) -> String {
+        format!("{}", self.hand[1])
+    }
+
+    pub fn print_hand(&self) -> String {
+        self.hand
+            .iter()
+            .map(|card| format!("{}", card))
+            .collect::<Vec<_>>()
+            .join(" and ")
+    }
+
+    pub fn calculate_hand_value(&self) -> u8 {
         let mut total = 0;
         let mut aces = 0;
 
-        for card in self.hand {
-            println!("{:?}", card);
+        for card in &self.hand {
             if card.rank == Rank::Ace {
                 aces += 1
             };
 
-            total += card.rank.value();
+            total += card.rank.clone().value();
         }
 
         while total > 21 && aces > 0 {
@@ -75,7 +86,10 @@ mod tests {
         deck.add_card(Card::new(Suit::Hearts, Rank::Ten));
         player.draw_card(&mut deck);
 
-        assert_eq!(player.show_hand(), vec![Card::new(Suit::Hearts, Rank::Ten)])
+        assert_eq!(
+            player.return_hand(),
+            vec![Card::new(Suit::Hearts, Rank::Ten)]
+        )
     }
 
     #[test]
