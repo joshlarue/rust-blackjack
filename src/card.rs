@@ -115,12 +115,19 @@ impl Card {
 impl fmt::Display for Card {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut card_unicode = String::new();
-        card_unicode.push_str("0x1F0");
-        card_unicode.push_str(&self.rank.clone().unicode_rank().to_string());
-        card_unicode.push_str(&self.suit.clone().unicode_suit().to_string());
-        let card_unicode: u32 = card_unicode.parse().unwrap_or(' ' as u32);
+        card_unicode.push_str("1F0");
 
-        write!(f, "{}", card_unicode)
+        let suit_unicode = self.suit.clone().unicode_suit();
+        let rank_unicode = &self.rank.clone().unicode_rank();
+
+        card_unicode.push(suit_unicode);
+        card_unicode.push_str(&format!("{:X}", rank_unicode));
+
+        let card_unicode_u32: u32 = u32::from_str_radix(card_unicode.as_str(), 16)
+            .expect("Unable to parse card's unicode into a u32.");
+        let card_char = std::char::from_u32(card_unicode_u32).unwrap();
+
+        write!(f, " {} ", card_char)
     }
 }
 impl PartialEq for Card {

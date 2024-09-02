@@ -2,6 +2,8 @@ mod card;
 mod deck;
 mod game_logic;
 mod player;
+use deck::*;
+use game_logic::*;
 use std::io;
 
 fn main() -> Result<(), io::Error> {

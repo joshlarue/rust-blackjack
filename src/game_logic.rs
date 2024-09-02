@@ -54,8 +54,8 @@ pub fn player_hit(deck: &mut deck::Deck, player1: &mut Player) {
     );
 }
 
-pub fn busted(player1: &mut Player) -> bool {
-    return player1.calculate_hand_value() > 21;
+pub fn busted(player: &mut Player) -> bool {
+    return player.calculate_hand_value() > 21;
 }
 
 pub fn determine_winner(deck: &mut deck::Deck, dealer: &mut Player, player1: &mut Player) {
@@ -65,6 +65,32 @@ pub fn determine_winner(deck: &mut deck::Deck, dealer: &mut Player, player1: &mu
 
     let dealer_hand_value = dealer.calculate_hand_value();
     let player_hand_value = player1.calculate_hand_value();
+
+    if busted(player1) {
+        println!("You busted!");
+        println!(
+            "The dealer wins with a hand of {} and a total value of {}.",
+            dealer.print_hand(),
+            dealer.calculate_hand_value()
+        );
+        println!(
+            "You had a hand of {} and a total value of {}.",
+            player1.print_hand(),
+            player1.calculate_hand_value()
+        );
+    } else if busted(dealer) {
+        println!("The dealer busted!");
+        println!(
+            "You win with a hand of {} and a total value of {}.",
+            player1.print_hand(),
+            player1.calculate_hand_value()
+        );
+        println!(
+            "The dealer had a hand of {} and a total value of {}.",
+            dealer.print_hand(),
+            dealer.calculate_hand_value()
+        );
+    }
 
     if dealer_hand_value > player_hand_value && dealer_hand_value <= 21 {
         println!(
@@ -102,30 +128,6 @@ pub fn determine_winner(deck: &mut deck::Deck, dealer: &mut Player, player1: &mu
             dealer.calculate_hand_value()
         );
     } else if player_hand_value > dealer_hand_value && player_hand_value <= 21 {
-        println!(
-            "You win with a hand of {} and a total value of {}.",
-            player1.print_hand(),
-            player1.calculate_hand_value()
-        );
-        println!(
-            "The dealer had a hand of {} and a total value of {}.",
-            dealer.print_hand(),
-            dealer.calculate_hand_value()
-        );
-    } else if busted(player1) {
-        println!("You busted!");
-        println!(
-            "The dealer wins with a hand of {} and a total value of {}.",
-            dealer.print_hand(),
-            dealer.calculate_hand_value()
-        );
-        println!(
-            "You had a hand of {} and a total value of {}.",
-            player1.print_hand(),
-            player1.calculate_hand_value()
-        );
-    } else if busted(dealer) {
-        println!("The dealer busted!");
         println!(
             "You win with a hand of {} and a total value of {}.",
             player1.print_hand(),
