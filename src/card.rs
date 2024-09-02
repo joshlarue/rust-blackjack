@@ -18,6 +18,17 @@ impl fmt::Display for Suit {
     }
 }
 
+impl Suit {
+    pub fn unicode_suit(self) -> char {
+        match self {
+            Suit::Clubs => 'D',
+            Suit::Diamonds => 'C',
+            Suit::Hearts => 'B',
+            Suit::Spades => 'A',
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Clone)]
 pub enum Rank {
     Ace,
@@ -71,6 +82,24 @@ impl Rank {
             Rank::King => 10,
         }
     }
+
+    pub fn unicode_rank(self) -> u8 {
+        match self {
+            Rank::Ace => 1,
+            Rank::Two => 2,
+            Rank::Three => 3,
+            Rank::Four => 4,
+            Rank::Five => 5,
+            Rank::Six => 6,
+            Rank::Seven => 7,
+            Rank::Eight => 8,
+            Rank::Nine => 9,
+            Rank::Ten => 0xA,
+            Rank::Jack => 0xB,
+            Rank::Queen => 0xD,
+            Rank::King => 0xE,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -85,7 +114,13 @@ impl Card {
 }
 impl fmt::Display for Card {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} of {}", self.rank, self.suit)
+        let mut card_unicode = String::new();
+        card_unicode.push_str("0x1F0");
+        card_unicode.push_str(&self.rank.clone().unicode_rank().to_string());
+        card_unicode.push_str(&self.suit.clone().unicode_suit().to_string());
+        let card_unicode: u32 = card_unicode.parse().unwrap_or(' ' as u32);
+
+        write!(f, "{}", card_unicode)
     }
 }
 impl PartialEq for Card {

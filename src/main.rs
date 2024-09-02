@@ -4,11 +4,9 @@ mod game_logic;
 mod player;
 use std::io;
 
-use deck::new_deck;
-use game_logic::*;
-
 fn main() -> Result<(), io::Error> {
     let mut deck = new_deck();
+    println!("\u{1F0A1}");
 
     let num_players = get_num_players()?;
 
