@@ -22,16 +22,22 @@ impl Player {
         }
     }
 
-    pub fn draw_card(&mut self, deck: &mut Deck) {
-        self.hand.push(deck.deal_card());
+    pub fn draw_card(&mut self, deck: &mut Deck, num_cards: u8) {
+        for _ in 0..num_cards {
+            self.hand.push(deck.deal_card());
+        }
     }
 
     pub fn return_hand(self) -> Vec<Card> {
         self.hand
     }
 
-    pub fn print_first_card(&self) -> String {
-        format!("{}", self.hand[1])
+    pub fn print_cards_in_range(&self, start: usize, end: usize) -> String {
+        let mut cards = String::new();
+        for i in start..end {
+            cards.push_str(&format!("{}", self.hand[i]));
+        }
+        cards
     }
 
     pub fn print_hand(&self) -> String {
@@ -84,7 +90,7 @@ mod tests {
         let mut player = Player::new(PlayerType::Player1);
         let mut deck = Deck::new();
         deck.add_card(Card::new(Suit::Hearts, Rank::Ten));
-        player.draw_card(&mut deck);
+        player.draw_card(&mut deck, 1);
 
         assert_eq!(
             player.return_hand(),
@@ -113,10 +119,10 @@ mod tests {
             rank: Rank::Two,
         });
 
-        player.draw_card(&mut deck);
-        player.draw_card(&mut deck);
-        player.draw_card(&mut deck);
-        player.draw_card(&mut deck);
+        player.draw_card(&mut deck, 1);
+        player.draw_card(&mut deck, 1);
+        player.draw_card(&mut deck, 1);
+        player.draw_card(&mut deck, 1);
 
         assert_eq!(player.calculate_hand_value(), 14);
     }

@@ -17,7 +17,23 @@ fn main() -> Result<(), io::Error> {
             Ok(players) => players,
             Err(_) => panic!("Player creation went horribly wrong!"),
         };
-        play_1_player_round(&mut deck, &mut dealer, &mut player1);
+
+        one_player_first_round(&mut deck, &mut dealer, &mut player1);
+
+        loop {
+            let hit = hit_or_stay()?;
+            if hit {
+                player_hit(&mut deck, &mut player1);
+                if busted(&mut player1) {
+                    determine_winner(&mut deck, &mut dealer, &mut player1);
+                    break;
+                };
+                continue;
+            } else {
+                determine_winner(&mut deck, &mut dealer, &mut player1);
+                break;
+            }
+        }
     }
 
     Ok(())
