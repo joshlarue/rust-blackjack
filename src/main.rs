@@ -8,7 +8,8 @@ use std::io;
 
 fn main() -> Result<(), io::Error> {
     let mut deck = new_deck();
-    println!("\u{1F0A1}");
+    // this print statement clears the screen
+    print!("\x1B[2J\x1B[1;1H");
 
     let num_players = get_num_players()?;
 
@@ -23,7 +24,7 @@ fn main() -> Result<(), io::Error> {
         loop {
             let hit = hit_or_stay()?;
             if hit {
-                player_hit(&mut deck, &mut player1);
+                player_hit(&mut deck, &mut dealer, &mut player1);
                 if busted(&mut player1) {
                     determine_winner(&mut deck, &mut dealer, &mut player1);
                     break;

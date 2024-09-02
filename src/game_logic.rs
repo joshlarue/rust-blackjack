@@ -37,20 +37,32 @@ pub fn hit_or_stay() -> Result<bool, Error> {
 
         // need to call .trim() so that the input doesn't include the \n
         match io_buf.as_str().trim() {
-            "h" => break Ok(true),
-            "s" => break Ok(false),
+            "h" => {
+                // this print statement clears the screen
+                print!("\x1B[2J\x1B[1;1H");
+                break Ok(true);
+            }
+            "s" => {
+                print!("\x1B[2J\x1B[1;1H");
+                break Ok(false);
+            }
             _ => continue,
         }
     }
 }
 
 /// draws one card for specified player and prints hand/value
-pub fn player_hit(deck: &mut deck::Deck, player1: &mut Player) {
+pub fn player_hit(deck: &mut deck::Deck, dealer: &mut Player, player1: &mut Player) {
     player1.draw_card(deck, 1);
     println!(
         "You have {} and your hand is worth {}.",
         player1.print_hand(),
         player1.calculate_hand_value()
+    );
+    println!(
+        "The dealer's face-up card is {} and is worth {}.",
+        dealer.print_cards_in_range(0, 1),
+        dealer.calculate_hand_value()
     );
 }
 
@@ -73,11 +85,11 @@ pub fn determine_winner(deck: &mut deck::Deck, dealer: &mut Player, player1: &mu
             dealer.print_hand(),
             dealer.calculate_hand_value()
         );
-        println!(
-            "You had a hand of {} and a total value of {}.",
-            player1.print_hand(),
-            player1.calculate_hand_value()
-        );
+        //println!(
+        //    "You had a hand of {} and a total value of {}.",
+        //    player1.print_hand(),
+        //    player1.calculate_hand_value()
+        //);
     } else if busted(dealer) {
         println!("The dealer busted!");
         println!(
@@ -155,8 +167,17 @@ pub fn get_num_players() -> Result<i8, Error> {
         };
 
         match number_res {
-            1 => break Ok(1),
-            2 => break Ok(2),
+            1 => {
+                // this line clears the console screen
+                print!("\x1B[2J\x1B[1;1H");
+                break Ok(1);
+            }
+            2 => {
+                break {
+                    print!("\x1B[2J\x1B[1;1H");
+                    Ok(2)
+                }
+            }
             _ => continue,
         }
     }
