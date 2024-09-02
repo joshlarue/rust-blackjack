@@ -90,9 +90,7 @@ pub fn determine_winner(deck: &mut deck::Deck, dealer: &mut Player, player1: &mu
             dealer.print_hand(),
             dealer.calculate_hand_value()
         );
-    }
-
-    if dealer_hand_value > player_hand_value && dealer_hand_value <= 21 {
+    } else if dealer_hand_value > player_hand_value {
         println!(
             "The dealer wins with a hand of {} and a total value of {}.",
             dealer.print_hand(),
@@ -103,10 +101,9 @@ pub fn determine_winner(deck: &mut deck::Deck, dealer: &mut Player, player1: &mu
             player1.print_hand(),
             player1.calculate_hand_value()
         );
-    } else if dealer_hand_value == player_hand_value {
-        println!("PUSHED! Y'all both have the same hand!");
+    } else if player_hand_value > dealer_hand_value {
         println!(
-            "You had a hand of {} and a total value of {}.",
+            "You win with a hand of {} and a total value of {}.",
             player1.print_hand(),
             player1.calculate_hand_value()
         );
@@ -127,9 +124,10 @@ pub fn determine_winner(deck: &mut deck::Deck, dealer: &mut Player, player1: &mu
             dealer.print_hand(),
             dealer.calculate_hand_value()
         );
-    } else if player_hand_value > dealer_hand_value && player_hand_value <= 21 {
+    } else if dealer_hand_value == player_hand_value {
+        println!("PUSHED! Y'all both have the same hand!");
         println!(
-            "You win with a hand of {} and a total value of {}.",
+            "You had a hand of {} and a total value of {}.",
             player1.print_hand(),
             player1.calculate_hand_value()
         );
