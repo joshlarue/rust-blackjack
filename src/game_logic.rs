@@ -51,7 +51,7 @@ pub fn hit_or_stay() -> Result<bool, Error> {
     }
 }
 
-/// draws one card for specified player and prints hand/value
+/// draws one card for specified player and prints hand/value for player and dealer
 pub fn player_hit(deck: &mut deck::Deck, dealer: &mut Player, player1: &mut Player) {
     player1.draw_card(deck, 1);
     println!(
@@ -62,7 +62,7 @@ pub fn player_hit(deck: &mut deck::Deck, dealer: &mut Player, player1: &mut Play
     println!(
         "The dealer's face-up card is {} and is worth {}.",
         dealer.print_cards_in_range(0, 1),
-        dealer.calculate_hand_value()
+        dealer.calculate_face_up_value(),
     );
 }
 

@@ -24,7 +24,11 @@ impl Player {
 
     pub fn draw_card(&mut self, deck: &mut Deck, num_cards: u8) {
         for _ in 0..num_cards {
-            self.hand.push(deck.deal_card());
+            self.hand = self
+                .hand
+                .iter()
+                .chain(vec![deck.deal_card()].iter())
+                .collect::<Vec<Card>>();
         }
     }
 
@@ -67,6 +71,10 @@ impl Player {
         }
 
         total
+    }
+
+    pub fn calculate_face_up_value(&self) -> u8 {
+        self.hand[0].rank.clone().value()
     }
 }
 
