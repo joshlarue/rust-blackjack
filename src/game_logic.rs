@@ -24,7 +24,7 @@ pub fn one_player_first_round(deck: &mut deck::Deck, dealer: &mut Player, player
     println!(
         "The dealer's face-up card is {} and is worth {}.",
         dealer.print_cards_in_range(0, 1),
-        dealer.calculate_hand_value()
+        dealer.calculate_face_up_value()
     );
 }
 
@@ -51,46 +51,86 @@ pub fn hit_or_stay() -> Result<bool, Error> {
     }
 }
 
-/// draws one card for specified player and prints hand/value for player and dealer
-pub fn player_hit(deck: &mut deck::Deck, dealer: &mut Player, player1: &mut Player) {
-    player1.draw_card(deck, 1);
-    println!(
-        "You have {} and your hand is worth {}.",
-        player1.print_hand(),
-        player1.calculate_hand_value()
-    );
-    println!(
-        "The dealer's face-up card is {} and is worth {}.",
-        dealer.print_cards_in_range(0, 1),
-        dealer.calculate_face_up_value(),
-    );
+pub fn play_again() -> Result<bool, Error> {
+    loop {
+        println!("\nPlay again? (y/n)");
+
+        let mut io_buf = String::new();
+        io::stdin().read_line(&mut io_buf)?;
+
+        // need to call .trim() so that the input doesn't include the \n
+        match io_buf.as_str().trim() {
+            "y" => {
+                // this print statement clears the screen
+                print!("\x1B[2J\x1B[1;1H");
+                break Ok(true);
+            }
+            "n" => {
+                print!("\x1B[2J\x1B[1;1H");
+                break Ok(false);
+            }
+            _ => continue,
+        }
+    }
 }
 
-pub fn busted(player: &mut Player) -> bool {
+/// draws one card for specified player and prints hand/value for player and dealer
+/// returns true/false for whether or not the player busted during the hit
+pub fn player_hit(deck: &mut deck::Deck, dealer: &mut Player, player1: &mut Player) -> bool {
+    player1.draw_card(deck, 1);
+
+    if busted(player1) {
+        determine_winner(deck, dealer, &*player1);
+        return true;
+    } else {
+        println!(
+            "You have {} and your hand is worth {}.",
+            player1.print_hand(),
+            player1.calculate_hand_value()
+        );
+        println!(
+            "The dealer's face-up card is {} and is worth {}.",
+            dealer.print_cards_in_range(0, 1),
+            dealer.calculate_face_up_value(),
+        );
+        return false;
+    }
+}
+
+pub fn busted(player: &Player) -> bool {
     return player.calculate_hand_value() > 21;
 }
 
-pub fn determine_winner(deck: &mut deck::Deck, dealer: &mut Player, player1: &mut Player) {
+pub fn blackjack(player: &Player) -> bool {
+    return player.calculate_hand_value() == 21;
+}
+
+pub fn determine_winner(deck: &mut deck::Deck, dealer: &mut Player, player1: &Player) {
+    let mut dealer_busted = false;
+    let player_busted = busted(player1);
+
     while dealer.calculate_hand_value() < 17 {
         dealer.draw_card(deck, 1);
+        if busted(dealer) {
+            dealer_busted = true;
+        }
     }
 
-    let dealer_hand_value = dealer.calculate_hand_value();
-    let player_hand_value = player1.calculate_hand_value();
-
-    if busted(player1) {
-        println!("You busted!");
+    // these returns don't return out of the function :(
+    if player_busted && dealer_busted {
+        println!("PUSHED! You and the dealer both busted!");
         println!(
-            "The dealer wins with a hand of {} and a total value of {}.",
+            "You had a hand of {} and a total value of {}.",
+            player1.print_hand(),
+            player1.calculate_hand_value()
+        );
+        println!(
+            "The dealer had a hand of {} and a total value of {}.",
             dealer.print_hand(),
             dealer.calculate_hand_value()
         );
-        //println!(
-        //    "You had a hand of {} and a total value of {}.",
-        //    player1.print_hand(),
-        //    player1.calculate_hand_value()
-        //);
-    } else if busted(dealer) {
+        return;
+    } else if dealer_busted {
         println!("The dealer busted!");
         println!(
             "You win with a hand of {} and a total value of {}.",
@@ -102,18 +142,37 @@ pub fn determine_winner(deck: &mut deck::Deck, dealer: &mut Player, player1: &mu
             dealer.print_hand(),
             dealer.calculate_hand_value()
         );
-    } else if dealer_hand_value > player_hand_value {
-        println!(
-            "The dealer wins with a hand of {} and a total value of {}.",
-            dealer.print_hand(),
-            dealer.calculate_hand_value()
-        );
+        return;
+    } else if player_busted {
+        println!("You busted!");
         println!(
             "You had a hand of {} and a total value of {}.",
             player1.print_hand(),
             player1.calculate_hand_value()
         );
-    } else if player_hand_value > dealer_hand_value {
+        println!(
+            "The dealer had a hand of {} and a total value of {}.",
+            dealer.print_hand(),
+            dealer.calculate_hand_value()
+        );
+        return;
+    }
+
+    let dealer_hand_value = dealer.calculate_hand_value();
+    let player_hand_value = player1.calculate_hand_value();
+
+    let player_blackjack = blackjack(player1);
+    let dealer_blackjack = blackjack(dealer);
+
+    if player_hand_value != dealer_hand_value {
+        if player_blackjack {
+            println!("You blackjacked!");
+        } else if dealer_blackjack {
+            println!("The dealer blackjacked!");
+        }
+    }
+
+    if player_hand_value <= 21 && player_hand_value > dealer_hand_value {
         println!(
             "You win with a hand of {} and a total value of {}.",
             player1.print_hand(),
@@ -124,8 +183,12 @@ pub fn determine_winner(deck: &mut deck::Deck, dealer: &mut Player, player1: &mu
             dealer.print_hand(),
             dealer.calculate_hand_value()
         );
-    } else if dealer_hand_value == player_hand_value && dealer_hand_value == 21 {
-        println!("PUSHED! Y'all both have a Blackjack!");
+    } else if player_hand_value == dealer_hand_value {
+        if player_blackjack {
+            println!("PUSHED! Y'all both have a Blackjack!");
+        } else {
+            println!("PUSHED! Y'all have the same hand value!");
+        }
         println!(
             "You had a hand of {} and a total value of {}.",
             player1.print_hand(),
@@ -136,17 +199,16 @@ pub fn determine_winner(deck: &mut deck::Deck, dealer: &mut Player, player1: &mu
             dealer.print_hand(),
             dealer.calculate_hand_value()
         );
-    } else if dealer_hand_value == player_hand_value {
-        println!("PUSHED! Y'all both have the same hand!");
+    } else {
+        println!(
+            "The dealer wins with a hand of {} and a total value of {}.",
+            dealer.print_hand(),
+            dealer.calculate_hand_value()
+        );
         println!(
             "You had a hand of {} and a total value of {}.",
             player1.print_hand(),
             player1.calculate_hand_value()
-        );
-        println!(
-            "The dealer had a hand of {} and a total value of {}.",
-            dealer.print_hand(),
-            dealer.calculate_hand_value()
         );
     }
 }

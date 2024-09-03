@@ -11,27 +11,30 @@ fn main() -> Result<(), io::Error> {
     // this print statement clears the screen
     print!("\x1B[2J\x1B[1;1H");
 
-    let num_players = get_num_players()?;
+    loop {
+        let num_players = get_num_players()?;
 
-    if num_players == 1 {
-        let (mut dealer, mut player1) = match create_one_player() {
-            Ok(players) => players,
-            Err(_) => panic!("Player creation went horribly wrong!"),
-        };
+        if num_players == 1 {
+            let (mut dealer, mut player1) = match create_one_player() {
+                Ok(players) => players,
+                Err(_) => panic!("Player creation went horribly wrong!"),
+            };
 
-        one_player_first_round(&mut deck, &mut dealer, &mut player1);
+            one_player_first_round(&mut deck, &mut dealer, &mut player1);
 
-        loop {
-            let hit = hit_or_stay()?;
-            if hit {
-                player_hit(&mut deck, &mut dealer, &mut player1);
-                if busted(&mut player1) {
-                    determine_winner(&mut deck, &mut dealer, &mut player1);
+            loop {
+                let hit = hit_or_stay()?;
+                if hit {
+                    let busted = player_hit(&mut deck, &mut dealer, &mut player1);
+                    if busted {
+                        break;
+                    }
+                } else {
+                    determine_winner(&mut deck, &mut dealer, &player1);
                     break;
-                };
-                continue;
-            } else {
-                determine_winner(&mut deck, &mut dealer, &mut player1);
+                }
+            }
+            if !play_again()? {
                 break;
             }
         }
